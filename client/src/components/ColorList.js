@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import axiosWithAuth from "../util/axiosWithAuth";
 import { useHistory } from 'react-router-dom'
 
@@ -9,9 +8,11 @@ const initialColor = {
 };
 
 const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
+  // console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const [ addedColor, setAddedColor ] = useState(initialColor);
+
 
   const { push } = useHistory()
 
@@ -30,6 +31,13 @@ const ColorList = ({ colors, updateColors }) => {
     // think about where will you get the id from...
     // where is is saved right now?
   };
+
+  const addColor = () => {
+    axiosWithAuth()
+    .post('/colors', addedColor )
+    .then(res => console.log(res))
+    .catch(err => console.log(err.message, err.response))
+}
 
   const deleteColor = color => {
     // make a delete request to delete this color
@@ -62,6 +70,33 @@ const ColorList = ({ colors, updateColors }) => {
           </li>
         ))}
       </ul>
+      <div>
+        <form onSubmit={addColor}>
+        <legend>Add A Color</legend>
+          <label>
+            color name:
+            <input
+              onChange={e =>
+                setAddedColor({ ...addedColor, color: e.target.value })
+              }
+              value={addedColor.color}
+            />
+          </label>
+          <label>
+            hex code:
+            <input
+              onChange={e =>
+                setAddedColor({
+                  ...addedColor,
+                  code: { hex: e.target.value }
+                })
+              }
+              value={addedColor.code.hex}
+            />
+          </label>
+        <button>Add Color</button>
+        </form>
+      </div>
       {editing && (
         <form onSubmit={saveEdit}>
           <legend>edit color</legend>
